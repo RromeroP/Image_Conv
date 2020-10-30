@@ -45,27 +45,25 @@ public class Image_Conv {
 
         int focus[][] = {
             {0, -1, 0},
-            {-1, 5, -1},
+            {-1, -5, -1},
             {0, -1, 0}
         };
 
-        int edge[][] = {
-            {0, 1, 0},
-            {1, -4, 1},
-            {0, 1, 0}
+        int negative[][] = {
+            {-1, -1, -1},
+            {0, 0, 0},
+            {1, 1, 1}
         };
 
         JPanel pane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                
                 draw(img, img, 0, null, g);
-
-                draw(img_blurr, img, 1, blurr, g);
-
-                draw(img_focus, img, 2, focus, g);
-
-                draw(img_edge, img, 3, edge, g);
+                draw(img_blurr, img, 1, negative, g);
+                draw(img_focus, img, 2, blurr, g);
+                draw(img_edge, img, 3, focus, g);
 
             }
         };
@@ -82,8 +80,8 @@ public class Image_Conv {
 
             int weight = weight(effect);
 
-            for (int width = 0; width < img.getWidth() - 1; width++) {
-                for (int height = 0; height < img.getHeight() - 1; height++) {
+            for (int width = 1; width < img.getWidth() - 1; width++) {
+                for (int height = 1; height < img.getHeight() - 1; height++) {
 
                     int b_total = 0;
                     int g_total = 0;
@@ -92,9 +90,14 @@ public class Image_Conv {
                     for (int i = 0; i < effect.length; i++) {
                         for (int j = 0; j < effect.length; j++) {
 
-                            int B = pixels[3 * (width + height * img.getWidth())] & 0xff;
-                            int G = pixels[1 + 3 * (width + height * img.getWidth())] & 0xff;
-                            int R = pixels[2 + 3 * (width + height * img.getWidth())] & 0xff;
+                            int new_height = height + j - effect.length / 2;
+                            int new_width = width + i - effect.length / 2;
+
+                            int p_position = (new_width + new_height * img.getWidth());
+
+                            int B = pixels[3 * p_position] & 0xff;
+                            int G = pixels[1 + 3 * p_position] & 0xff;
+                            int R = pixels[2 + 3 * p_position] & 0xff;
 
                             b_total += B * effect[i][j];
                             g_total += G * effect[i][j];
@@ -103,22 +106,28 @@ public class Image_Conv {
                         }
                     }
 
-                    if (b_total != 0) {
-                        new_pixels[3 * (width + height * new_img.getWidth())] = (byte) (b_total / weight);
+                    if (b_total != 0 && weight != 0) {
+                        new_pixels[3 * (width + height * new_img.getWidth())]
+                                = (byte) (b_total / weight);
                     } else {
-                        new_pixels[3 * (width + height * new_img.getWidth())] = (byte) b_total;
+                        new_pixels[3 * (width + height * new_img.getWidth())]
+                                = (byte) b_total;
                     }
 
-                    if (g_total != 0) {
-                        new_pixels[1 + 3 * (width + height * new_img.getWidth())] = (byte) (g_total / weight);
+                    if (g_total != 0 && weight != 0) {
+                        new_pixels[1 + 3 * (width + height * new_img.getWidth())]
+                                = (byte) (g_total / weight);
                     } else {
-                        new_pixels[1 + 3 * (width + height * new_img.getWidth())] = (byte) g_total;
+                        new_pixels[1 + 3 * (width + height * new_img.getWidth())]
+                                = (byte) g_total;
                     }
 
-                    if (r_total != 0) {
-                        new_pixels[2 + 3 * (width + height * new_img.getWidth())] = (byte) (r_total / weight);
+                    if (r_total != 0 && weight != 0) {
+                        new_pixels[2 + 3 * (width + height * new_img.getWidth())]
+                                = (byte) (r_total / weight);
                     } else {
-                        new_pixels[2 + 3 * (width + height * new_img.getWidth())] = (byte) r_total;
+                        new_pixels[2 + 3 * (width + height * new_img.getWidth())]
+                                = (byte) r_total;
                     }
 
                 }
