@@ -27,15 +27,25 @@ public class Image_Conv {
         // TODO code application logic here
 
         BufferedImage img = ImageIO.read(new File("src\\images\\car.jpg"));
+        BufferedImage img_negative = ImageIO.read(new File("src\\images\\car.jpg"));
         BufferedImage img_blurr = ImageIO.read(new File("src\\images\\car.jpg"));
         BufferedImage img_focus = ImageIO.read(new File("src\\images\\car.jpg"));
-        BufferedImage img_edge = ImageIO.read(new File("src\\images\\car.jpg"));
+//        BufferedImage img_edge = ImageIO.read(new File("src\\images\\car.jpg"));
 
         JFrame frame = new JFrame();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(img.getWidth() * 4, img.getHeight());
+        
+        int ROWS = 4;
+        int COLS = 1;
+        frame.setSize(img.getWidth() * ROWS, img.getHeight() * COLS);
         frame.setVisible(true);
+
+        int negative[][] = {
+            {-1, -1, -1},
+            {0, 0, 0},
+            {1, 1, 1}
+        };
 
         int blurr[][] = {
             {1, 1, 1},
@@ -48,22 +58,22 @@ public class Image_Conv {
             {-1, -5, -1},
             {0, -1, 0}
         };
-
-        int negative[][] = {
-            {-1, -1, -1},
-            {0, 0, 0},
-            {1, 1, 1}
-        };
+//
+//        int edge[][] = {
+//            {-1, -1, -1},
+//            {-1, 8, -1},
+//            {-1, -1, -1}
+//        };
 
         JPanel pane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                
-                draw(img, img, 0, null, g);
-                draw(img_blurr, img, 1, negative, g);
-                draw(img_focus, img, 2, blurr, g);
-                draw(img_edge, img, 3, focus, g);
+
+                draw(img, img, 0, 0, null, g);
+                draw(img_negative, img, 1, 0, negative, g);
+                draw(img_blurr, img, 2, 0, blurr, g);
+                draw(img_focus, img, 3, 0, focus, g);
 
             }
         };
@@ -71,7 +81,7 @@ public class Image_Conv {
         frame.add(pane);
     }
 
-    private static void draw(BufferedImage new_img, BufferedImage img, int position, int[][] effect, Graphics g) {
+    private static void draw(BufferedImage new_img, BufferedImage img, int position_x, int position_y, int[][] effect, Graphics g) {
 
         if (effect != null) {
 
@@ -106,36 +116,21 @@ public class Image_Conv {
                         }
                     }
 
-                    if (b_total != 0 && weight != 0) {
-                        new_pixels[3 * (width + height * new_img.getWidth())]
-                                = (byte) (b_total / weight);
-                    } else {
-                        new_pixels[3 * (width + height * new_img.getWidth())]
-                                = (byte) b_total;
-                    }
+                    new_pixels[3 * (width + height * new_img.getWidth())]
+                            = (byte) normalize(b_total, weight);
 
-                    if (g_total != 0 && weight != 0) {
-                        new_pixels[1 + 3 * (width + height * new_img.getWidth())]
-                                = (byte) (g_total / weight);
-                    } else {
-                        new_pixels[1 + 3 * (width + height * new_img.getWidth())]
-                                = (byte) g_total;
-                    }
+                    new_pixels[1 + 3 * (width + height * new_img.getWidth())]
+                            = (byte) normalize(g_total, weight);
 
-                    if (r_total != 0 && weight != 0) {
-                        new_pixels[2 + 3 * (width + height * new_img.getWidth())]
-                                = (byte) (r_total / weight);
-                    } else {
-                        new_pixels[2 + 3 * (width + height * new_img.getWidth())]
-                                = (byte) r_total;
-                    }
+                    new_pixels[2 + 3 * (width + height * new_img.getWidth())]
+                            = (byte) normalize(r_total, weight);
 
                 }
             }
 
         }
 
-        g.drawImage(new_img, new_img.getWidth() * position, 0, null);
+        g.drawImage(new_img, new_img.getWidth() * position_x, new_img.getHeight() * position_y, null);
     }
 
     public static int weight(int effect[][]) {
@@ -149,5 +144,20 @@ public class Image_Conv {
         }
 
         return weight;
+    }
+
+    private static int normalize(int total, int weight) {
+        if (total != 0 && weight != 0) {
+            total = total / weight;
+        } else {
+            if (total < 0) {
+                total = 0;
+            } else if (total > 255) {
+                total = 255;
+            }
+
+        }
+
+        return total;
     }
 }
