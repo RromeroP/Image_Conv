@@ -11,6 +11,7 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -25,11 +26,13 @@ public class Image_Conv {
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
+        
+        JFileChooser fileExplorer;
 
-        BufferedImage img = ImageIO.read(new File("src\\images\\car.jpg"));
-        BufferedImage img_negative = ImageIO.read(new File("src\\images\\car.jpg"));
-        BufferedImage img_blurr = ImageIO.read(new File("src\\images\\car.jpg"));
-        BufferedImage img_focus = ImageIO.read(new File("src\\images\\car.jpg"));
+        BufferedImage img = ImageIO.read(new File("src\\images\\forest.jpg"));
+        BufferedImage img_negative = ImageIO.read(new File("src\\images\\forest.jpg"));
+        BufferedImage img_blurr = ImageIO.read(new File("src\\images\\forest.jpg"));
+        BufferedImage img_focus = ImageIO.read(new File("src\\images\\forest.jpg"));
 //        BufferedImage img_edge = ImageIO.read(new File("src\\images\\car.jpg"));
 
         JFrame frame = new JFrame();
@@ -54,9 +57,9 @@ public class Image_Conv {
         };
 
         int focus[][] = {
-            {0, -1, 0},
-            {-1, -5, -1},
-            {0, -1, 0}
+            {1, 2, 1},
+            {0, 0, 0},
+            {-1, -2, -1}
         };
 //
 //        int edge[][] = {
